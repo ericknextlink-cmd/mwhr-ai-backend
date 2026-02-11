@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+python-multipart
+httpx
+pydantic-settings
+langchain
+langchain-community
+langchain-openai
+langchain-text-splitters
+chromadb
+pymupdf
+pytesseract
+pillow
+python-dotenv

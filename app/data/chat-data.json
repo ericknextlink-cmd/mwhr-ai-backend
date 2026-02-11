@@ -1,0 +1,59 @@
+{
+  "intents": [
+    {
+      "id": "greeting",
+      "patterns": ["hello", "hi", "hey", "good morning", "good afternoon"],
+      "response": "Hello! I'm Mavis, your Ministry Assistant. I can help you with information about Contractor Classification, Fees, and the Application Process. What would you like to know?"
+    },
+    {
+          "id": "fees_general",
+          "patterns": ["how much", "cost", "fee", "price", "payment"],
+          "response": "The certification fees depend on the Class and Category (DK, E, G). \n- **DK (Building/Civil)**: ¢600 - ¢3,500 \n- **E (Electrical)**: ¢300 - ¢1,500 \n- **G (Plumbing)**: ¢400 - ¢1,000 \n\n Would you like to know the fee for a specific category?"
+        },
+        {
+          "id": "fees_electrical",
+          "patterns": ["electrical fee", "electrical cost", "price for electrical"],
+          "response": "**Electrical Works (Category E) Fees:**\n- **Class E1**: ¢1,500 (Renewal: ¢410)\n- **Class E2**: ¢1,000 (Renewal: ¢210)\n- **Class E3**: ¢300 (Renewal: ¢50)"
+        },
+        {
+          "id": "fees_building",
+          "patterns": ["building fee", "construction cost", "civil works price"],
+          "response": "**Building & Civil Works (Category DK) Fees:**\n- **Class D1K1**: ¢3,500 (Renewal: ¢2010)\n- **Class D2K2**: ¢2,500 (Renewal: ¢410)\n- **Class D3K3**: ¢600 (Renewal: ¢210)"
+        },
+        {
+          "id": "fees_plumbing",
+          "patterns": ["plumbing fee", "plumbing cost", "price for plumbing"],
+          "response": "**Plumbing Works (Category G) Fees:**\n- **Class G1**: ¢1,000 (Renewal: ¢210)\n- **Class G2**: ¢400 (Renewal: ¢50)"
+        },    {
+      "id": "documents",
+      "patterns": ["document", "requirement", "need to upload", "files"],
+      "response": "You will need to upload scanned copies of the following:\n1. **Certificate of Incorporation**\n2. **Certificate to Commence Business**\n3. **Tax Clearance Certificate**\n4. **SSNIT Clearance Certificate**\n\nEnsure they are clear PDF or Image files."
+    },
+    {
+      "id": "process",
+      "patterns": ["how to apply", "steps", "process", "procedure"],
+      "response": "The application process is simple:\n1. **Register** an account.\n2. **Select** your certification type (Electrical, Building, Plumbing).\n3. **Pay** the processing fee via Ghana.gov.\n4. **Fill** company and director details.\n5. **Upload** required documents.\n6. **Wait** for Ministry review and approval."
+    },
+    {
+      "id": "duration",
+      "patterns": ["how long", "duration", "time", "when will i get"],
+      "response": "The review process typically takes **5-10 working days** after submission. You will receive an email notification once your certificate is approved."
+    },
+    {
+      "id": "contact",
+      "patterns": ["contact", "phone", "email", "support", "help"],
+      "response": "You can reach the Classification Office at:\n- **Phone:** 00 233 784 787 58\n- **Email:** info@mofh.gov.gh\n- **Location:** Ministry of Works and Housing, Accra."
+    },
+    {
+      "id": "location",
+      "patterns": ["where is", "location", "address", "office"],
+      "response": "The Ministry of Works and Housing is located in **Accra, Ghana**. You can find us near the Ministries Area, adjacent to the Water Resources Commission."
+    },
+    {
+      "id": "issued_certificates",
+      "patterns": ["list all certificates", "types of certificates", "certificates issued", "what do you issue", "which certificate", "what certificate", "license", "licenses", "which license"],
+      "response": "The Ministry of Works, Housing & Water Resources issues the following Classification Certificates:\n1. **General Building & Civil Works**: For contractors in construction, roads, and infrastructure.\n2. **Electrical Works**: For electrical installations and maintenance projects.\n3. **Plumbing Works**: For water supply and sanitary installation services.\n\nYou can apply for any of these through this portal."
+    }
+  ],
+  "default_response": "I'm not sure I understand. I can help with **Fees**, **Documents**, **Application Process**, or **Contact Info**. Could you rephrase your question?"
+}
