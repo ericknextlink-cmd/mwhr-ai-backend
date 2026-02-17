@@ -17,6 +17,7 @@ class AnalyzeDocumentRequest(BaseModel):
     extract_forms: Optional[bool] = False
     languages: Optional[List[str]] = ["eng"]
     application_company_name: Optional[str] = None
+    thread_id: Optional[str] = None
 
 class ExtractDocumentRequest(BaseModel):
     document_url: HttpUrl
@@ -47,6 +48,7 @@ async def analyze_document(request: AnalyzeDocumentRequest):
             extract_forms=request.extract_forms,
             languages=request.languages,
             application_company_name=request.application_company_name,
+            thread_id=request.thread_id,
         )
         return result
     except Exception as e:

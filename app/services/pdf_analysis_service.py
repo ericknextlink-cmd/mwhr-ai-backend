@@ -12,6 +12,11 @@ except ImportError:
 from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
 from app.core.config import settings
+from app.services.thread_context import (
+    get_thread_context,
+    update_thread_context,
+    build_previous_documents_prompt,
+)
 
 # Optional: local PDF + OCR (scanned/image pages)
 try:
@@ -42,6 +47,7 @@ class PDFAnalysisService:
         extract_forms: bool = False,
         languages: List[str] = None,
         application_company_name: Optional[str] = None,
+        thread_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         if languages is None:
             languages = ["eng"]
@@ -83,29 +89,41 @@ class PDFAnalysisService:
                 }
             
             extracted_text = self._combine_documents(documents)
-            
+            thread_context = get_thread_context(thread_id) if thread_id else None
             analysis = await self._analyze_content(
                 extracted_text=extracted_text,
                 document_type=document_type,
                 documents=documents,
                 application_company_name=application_company_name,
+                thread_context=thread_context,
             )
-            
             tables = self._extract_tables(documents)
             forms = self._extract_forms(documents) if extract_forms else []
             
             # Parse company match guard from analysis (LLM outputs COMPANY_MATCH: YES or COMPANY_MISMATCH: ...)
             company_match: Optional[bool] = None
             company_match_detail: Optional[str] = None
+            companies_mentioned_in_doc: Optional[str] = None
             if application_company_name and isinstance(analysis, str):
                 if "COMPANY_MISMATCH:" in analysis:
                     company_match = False
                     idx = analysis.find("COMPANY_MISMATCH:")
                     end = analysis.find("\n", idx)
                     company_match_detail = (analysis[idx:end] if end != -1 else analysis[idx:]).strip()
+                    companies_mentioned_in_doc = company_match_detail.replace("COMPANY_MISMATCH:", "").strip()[:200]
                 elif "COMPANY_MATCH: YES" in analysis or "COMPANY_MATCH:YES" in analysis:
                     company_match = True
-            
+                    companies_mentioned_in_doc = application_company_name
+
+            if thread_id:
+                update_thread_context(
+                    thread_id,
+                    application_company_name,
+                    document_type,
+                    company_match=company_match,
+                    companies_mentioned=companies_mentioned_in_doc,
+                )
+
             return {
                 "success": True,
                 "extracted_text": extracted_text,
@@ -270,6 +288,7 @@ class PDFAnalysisService:
         document_type: str,
         documents: List,
         application_company_name: Optional[str] = None,
+        thread_context: Optional[Dict[str, Any]] = None,
     ) -> str:
         if not self.openai_api_key:
             return "OpenAI API key not configured. Analysis unavailable."
@@ -309,8 +328,12 @@ This document is being reviewed for an application submitted on behalf of the co
 - If the document clearly refers to the SAME company (or the same legal entity) as the application company, output at the END: COMPANY_MATCH: YES
 - Do not approve or state that the document is compliant if there is a company name mismatch; treat mismatch as a critical compliance failure.
 """
+            previous_docs_block = ""
+            if thread_context:
+                previous_docs_block = "\n\n" + build_previous_documents_prompt(thread_context) + "\n\n"
             
             template_str = f"""Analyze this {document_type} document for completeness, accuracy, and compliance with ministry requirements.
+{previous_docs_block}
 {company_guard}
 
 Extract and verify:

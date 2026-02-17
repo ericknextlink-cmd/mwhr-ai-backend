@@ -60,13 +60,41 @@ class ChatService:
             
         return None
 
+    _OFF_TOPIC_RESPONSE = (
+        "I can only assist with questions about the Ministry of Works, Housing & Water Resources "
+        "certification and application process. For code or other topics, please try another platform."
+    )
+
+    def _is_off_topic_or_code(self, message: str) -> bool:
+        """Heuristic: treat as off-topic if message looks like code or clearly unrelated to certification."""
+        if not message or len(message.strip()) < 2:
+            return True
+        msg = message.strip()
+        msg_lower = msg.lower()
+        # Code blocks
+        if "```" in msg or "def " in msg_lower or "function " in msg_lower or "import " in msg_lower:
+            return True
+        if "const " in msg_lower or "let " in msg_lower or "var " in msg_lower or "class " in msg_lower:
+            return True
+        if "=>" in msg or "->" in msg or "{" in msg and "}" in msg and ("(" in msg or ";" in msg):
+            return True
+        # Mostly non-letters (symbols/numbers)
+        letters = sum(1 for c in msg if c.isalpha() or c.isspace())
+        if len(msg) > 20 and letters / max(len(msg), 1) < 0.4:
+            return True
+        return False
+
     async def generate_response(self, message: str, history: List[Dict[str, str]]) -> str:
         # Step 1: Pattern Matching
         pattern_response = self._try_pattern_match(message)
         if pattern_response:
             return pattern_response
+
+        # Step 2: Reject off-topic / code
+        if self._is_off_topic_or_code(message):
+            return self._OFF_TOPIC_RESPONSE
             
-        # Step 2: AI Generation
+        # Step 3: AI Generation
         if not self.openai_api_key:
             return self.pattern_guide.get("default_response", "") + " (AI service unavailable)"
             
@@ -106,6 +134,8 @@ CRITICAL INSTRUCTIONS:
    - Be professional, accurate, and helpful
 
 5. If information is truly not in either source, acknowledge this and provide what you can from available sources
+
+6. If the user's message is primarily code, or clearly unrelated to certification/ministry (e.g. general coding help, math, other topics), respond with exactly: "I can only assist with questions about the Ministry of Works, Housing & Water Resources certification and application process. For code or other topics, please try another platform."
 
 KNOWLEDGE BASE (Guidelines and Procedures):
 {self.knowledge_base}
